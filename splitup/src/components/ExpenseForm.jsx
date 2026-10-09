@@ -21,10 +21,16 @@ export default function ExpenseForm({ room, me, onClose, onSaved }) {
   // Focus the first field and let Escape close the sheet.
   useEffect(() => {
     firstField.current?.focus();
-    const onKey = (e) => e.key === 'Escape' && onClose();
+  }, []);
+ 
+  // Escape closes the sheet. A ref holds the latest onClose so the listener is added only once.
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+  useEffect(() => {
+    const onKey = (e) => e.key === 'Escape' && onCloseRef.current();
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [onClose]);
+  }, []);
 
   const toggle = (id) =>
     setSplitBetween((cur) => (cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id]));
